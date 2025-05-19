@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Travel Cost Calculator</title>
+<style>
+  body { font-family: sans-serif; }
+  .container { width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+  label { display: block; margin-bottom: 5px; }
+  input[type="number"], input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+  button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  #result { margin-top: 20px; font-weight: bold; }
+  .input-group { border: 1px solid #eee; padding: 10px; margin-bottom: 15px; border-radius: 3px; }
+  .input-group h4 { margin-top: 0; }
+  .comparison-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .comparison-table th, .comparison-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  .comparison-table th { background-color: #f2f2f2; }
+  .difference { font-weight: bold; color: green; }
+  .negative-difference { color: red; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Travel Cost Calculator</h2>
+
+    <div class="input-group">
+      <h4>Calculate Car Costs Per Kilometer</h4>
+      <label for="fuelConsumption">Fuel Consumption (L/100km):</label>
+      <input type="number" id="fuelConsumption" value="7.8">
+
+      <label for="fuelPrice">Fuel Price ($/L):</label>
+      <input type="number" id="fuelPrice" value="2.20">
+
+      <label for="annualServiceCost">Annual Service Cost (over 10 years):</label>
+      <input type="number" id="annualServiceCost" value="858">
+
+      <label for="serviceInterval">Service Interval (km):</label>
+      <input type="number" id="serviceInterval" value="10000">
+
+      <label for="tyreSetCost">Tyre Set Cost ($):</label>
+      <input type="number" id="tyreSetCost" value="1500">
+
+      <label for="tyreLife">Tyre Life (km):</label>
+      <input type="number" id="tyreLife" value="25000">
+
+      <label for="annualInsurance">Annual Insurance Cost ($):</label>
+      <input type="number" id="annualInsurance" value="1300">
+
+      <label for="annualRegistration">Annual Registration Cost ($):</label>
+      <input type="number" id="annualRegistration" value="690">
+
+      <label for="annualKilometers">Estimated Annual Kilometers:</label>
+      <input type="number" id="annualKilometers" value="15000">
+
+      <label for="annualLicenceCost">Annual Licence Cost (averaged):</label>
+      <input type="number" id="annualLicenceCost" value="5.5">
+    </div>
+
+    <h3>Trip Details</h3>
+    <label for="distance">Distance (km):</label>
+    <input type="number" id="distance">
+
+    <label for="drivingTime">Driving Time (minutes):</label>
+    <input type="number" id="drivingTime">
+
+    <h3>Public Transport (Optional)</h3>
+    <label for="publicTransportCost">Public Transport Cost (one way):</label>
+    <input type="number" id="publicTransportCost">
+
+    <label for="publicTransportTime">Public Transport Time (minutes):</label>
+    <input type="number" id="publicTransportTime">
+
+    <button onclick="recalculateAndCalculateTrip()">Calculate</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function recalculateAndCalculateTrip() {
+      // Get values for car cost per km calculation
+      const fuelConsumption = parseFloat(document.getElementById("fuelConsumption").value);
+      const fuelPrice = parseFloat(document.getElementById("fuelPrice").value);
+      const annualServiceCost = parseFloat(document.getElementById("annualServiceCost").value);
+      const serviceInterval = parseFloat(document.getElementById("serviceInterval").value);
+      const tyreSetCost = parseFloat(document.getElementById("tyreSetCost").value);
+      const tyreLife = parseFloat(document.getElementById("tyreLife").value);
+      const annualInsurance = parseFloat(document.getElementById("annualInsurance").value);
+      const annualRegistration = parseFloat(document.getElementById("annualRegistration").value);
+      const annualKilometers = parseFloat(document.getElementById("annualKilometers").value);
+      const annualLicenceCost = parseFloat(document.getElementById("annualLicenceCost").value);
+
+      // Calculate car costs per km
+      const fuelCostPerKm = (fuelConsumption / 100) * fuelPrice;
+      const serviceCostPerKm = annualServiceCost / (annualKilometers / (serviceInterval / 10000));
+      const tyreCostPerKm = tyreSetCost / tyreLife;
+      const regInsuranceCostPerKm = (annualInsurance + annualRegistration) / annualKilometers;
+      const licenceCostPerKm = annualLicenceCost / annualKilometers;
+      const totalCarCostPerKm = fuelCostPerKm + serviceCostPerKm + tyreCostPerKm + regInsuranceCostPerKm + licenceCostPerKm;
+
+      // Get trip details
+      const distance = parseFloat(document.getElementById("distance").value);
+      const drivingTime = parseFloat(document.getElementById("drivingTime").value);
+      const publicTransportCost = parseFloat(document.getElementById("publicTransportCost").value);
+      const publicTransportTime = parseFloat(document.getElementById("publicTransportTime").value);
+
+      if (isNaN(distance) || isNaN(drivingTime)) {
+        document.getElementById("result").innerText = "Please enter valid distance and driving time.";
+        return;
+      }
+
+      const totalCarCost = totalCarCostPerKm * distance;
+      const carCostPerMinute = totalCarCost / drivingTime;
+      const carCostPerHour = carCostPerMinute * 60;
+
+      let resultHTML = `<h3>Car Costs Per Kilometer:</h3>`;
+      resultHTML += `Fuel: $${fuelCostPerKm.toFixed(3)}<br>`;
+      resultHTML += `Service: $${serviceCostPerKm.toFixed(3)}<br>`;
+      resultHTML += `Tyres: $${tyreCostPerKm.toFixed(3)}<br>`;
+      resultHTML += `Registration & Insurance: $${regInsuranceCostPerKm.toFixed(3)}<br>`;
+      resultHTML += `Licence: $${licenceCostPerKm.toFixed(3)}<br><br>`;
+      resultHTML += `Total Cost Per Kilometer: $${totalCarCostPerKm.toFixed(3)}<br><br>`;
+
+      resultHTML += `<h3>Car Travel for this Trip:</h3>`;
+      resultHTML += `Total Cost: $${totalCarCost.toFixed(2)}<br>`;
+      resultHTML += `Cost Per Kilometer: $${totalCarCostPerKm.toFixed(3)}<br>`;
+      resultHTML += `Cost Per Minute: $${carCostPerMinute.toFixed(2)}<br>`;
+      resultHTML += `Cost Per Hour: $${carCostPerHour.toFixed(2)}<br>`;
+
+      if (!isNaN(publicTransportCost) && !isNaN(publicTransportTime) && !isNaN(distance) && distance > 0) {
+        const publicTransportCostPerKm = publicTransportCost / distance;
+        const publicTransportCostPerMinute = publicTransportCost / publicTransportTime;
+        const publicTransportCostPerHour = publicTransportCostPerMinute * 60;
+        const timeDifference = publicTransportTime - drivingTime;
+        const costDifference = publicTransportCost - totalCarCost;
+        const costDifferencePerKm = publicTransportCostPerKm - totalCarCostPerKm;
+        const costDifferencePerMinute = publicTransportCostPerMinute - carCostPerMinute;
+        const costDifferencePerHour = publicTransportCostPerHour - carCostPerHour;
+
+        resultHTML += `<h3>Public Transport:</h3>`;
+        resultHTML += `Cost: $${publicTransportCost.toFixed(2)}<br>`;
+        resultHTML += `Cost Per Kilometer: $${publicTransportCostPerKm.toFixed(3)}<br>`;
+        resultHTML += `Cost Per Minute: $${publicTransportCostPerMinute.toFixed(2)}<br>`;
+        resultHTML += `Cost Per Hour: $${publicTransportCostPerHour.toFixed(2)}<br>`;
+        resultHTML += `Time: ${publicTransportTime} minutes<br><br>`;
+
+        resultHTML += `<table class="comparison-table">`;
+        resultHTML += `<thead><tr><th>Metric</th><th>Car Travel</th><th>Public Transport</th><th>Difference</th></tr></thead>`;
+        resultHTML += `<tbody>`;
+        resultHTML += `<tr><td><strong>Total Cost</strong></td><td>$${totalCarCost.toFixed(2)}</td><td>$${publicTransportCost.toFixed(2)}</td><td class="${costDifference < 0 ? 'difference' : 'negative-difference'}">$${costDifference.toFixed(2)}</td></tr>`;
+        resultHTML += `<tr><td><strong>Cost Per Kilometer</strong></td><td>$${totalCarCostPerKm.toFixed(3)}</td><td>$${publicTransportCostPerKm.toFixed(3)}</td><td class="${costDifferencePerKm < 0 ? 'difference' : 'negative-difference'}">$${costDifferencePerKm.toFixed(3)}</td></tr>`;
+        resultHTML += `<tr><td><strong>Cost Per Minute</strong></td><td>$${carCostPerMinute.toFixed(2)}</td><td>$${publicTransportCostPerMinute.toFixed(2)}</td><td class="${costDifferencePerMinute < 0 ? 'difference' : 'negative-difference'}">$${costDifferencePerMinute.toFixed(2)}</td></tr>`;
+        resultHTML += `<tr><td><strong>Cost Per Hour</strong></td><td>$${carCostPerHour.toFixed(2)}</td><td>$${publicTransportCostPerHour.toFixed(2)}</td><td class="${costDifferencePerHour < 0 ? 'difference' : 'negative-difference'}">$${costDifferencePerHour.toFixed(2)}</td></tr>`;
+        resultHTML += `<tr><td><strong>Travel Time</strong></td><td>${drivingTime} mins</td><td>${publicTransportTime} mins</td><td class="${timeDifference > 0 ? 'negative-difference' : 'difference'}">${timeDifference} mins</td></tr>`;
+        resultHTML += `</tbody>`;
+        resultHTML += `</table>`;
+
+        resultHTML += `<p>`;
+        if (costDifference < 0) {
+          resultHTML += `Public transport is <span class="difference">$${Math.abs(costDifference).toFixed(2)}</span> cheaper than driving. `;
+        } else if (costDifference > 0) {
+          resultHTML += `Driving is <span class="negative-difference">$${costDifference.toFixed(2)}</span> more expensive than public transport. `;
+        } else {
+          resultHTML += `Driving and public transport cost the same. `;
+        }
+
+        if (timeDifference > 0) {
+          resultHTML += `Public transport takes <span class="negative-difference">${timeDifference}</span> minutes longer. The approximate 'cost' of this extra time (based on the difference in driving cost per minute) is $<span class="negative-difference">${Math.abs(costDifferencePerMinute * timeDifference).toFixed(2)}</span>.`;
+        } else if (timeDifference < 0) {
+          resultHTML += `Driving is <span class="difference">${Math.abs(timeDifference)}</span> minutes longer. You save approximately $<span class="difference">${Math.abs(costDifferencePerMinute * timeDifference).toFixed(2)}</span> in driving costs during this extra time.`;
+        } else {
+          resultHTML += `Driving and public transport take the same amount of time.`;
+        }
+        resultHTML += `</p>`;
+
+      } else if (!isNaN(publicTransportCost) && !isNaN(publicTransportTime)) {
+        resultHTML += `<h3>Public Transport:</h3>`;
+        resultHTML += `Cost: $${publicTransportCost.toFixed(2)}<br>`;
+        resultHTML += `Time: ${publicTransportTime} minutes<br><br>`;
+        resultHTML += `(Cost per kilometer and detailed comparison for public transport require a valid distance.)<br>`;
+      } else {
+        resultHTML += `<p>Please enter public transport costs and times to see a comparison.</p>`;
+      }
+
+      document.getElementById("result").innerHTML = resultHTML;
+    }
+  </script>
+</body>
+</html>
